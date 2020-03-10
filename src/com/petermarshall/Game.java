@@ -221,13 +221,13 @@ public class Game {
     private static void printWinner() {
         char winner = detectWin(playingBoard);
         if (winner == SPACE) {
+            printBoard(playingBoard);
             System.out.println("Game was drawn, bor-ing!");
+        } else if (userCharacter == winner) {
+            System.out.println("You won, Congratulations!");
         } else {
-            if (userCharacter == winner) {
-                System.out.println("You won, Congratulations!");
-            } else {
-                printBoard(playingBoard);
-                System.out.println("The computer won. Unlucky.");
+            printBoard(playingBoard);
+            System.out.println("The computer won. Unlucky.");
             }
         }
     }
