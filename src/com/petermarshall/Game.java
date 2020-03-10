@@ -172,14 +172,26 @@ public class Game {
 
 
     //everything from here downwards is just so I can play. Not assessed.
-    //Would ordinarily be implemented using class fields rather than passing in args for each function,
-    // but want these extra methods completely separate from assessed content.
-
     private static Scanner s;
+    private static char[][] playingBoard;
+    private static boolean isFirst;
+    private static char userCharacter;
 
     public static void main(String[] args) {
         s = new Scanner(System.in);
         play();
+    }
+
+    private static void play() {
+        isFirst = goesFirstOrSecond();
+        playingBoard = new char[][]{{SPACE,SPACE,SPACE}, {SPACE,SPACE,SPACE}, {SPACE,SPACE,SPACE}};
+        addMoves();
+        printWinner();
+        if (wantsToPlayAgain()) {
+            play();
+        } else {
+            System.out.println("Bye");
+        }
     }
 
     private static void printBoard(char[][] board) {
@@ -206,16 +218,15 @@ public class Game {
         return firstAnswers.contains(answer);
     }
 
-    private static void printWinner(char[][] board, boolean isFirst) {
-        char winner = detectWin(board);
+    private static void printWinner() {
+        char winner = detectWin(playingBoard);
         if (winner == SPACE) {
             System.out.println("Game was drawn, bor-ing!");
         } else {
-            char userPiece = isFirst ? CROSSES : NOUGHTS;
-            if (userPiece == winner) {
+            if (userCharacter == winner) {
                 System.out.println("You won, Congratulations!");
             } else {
-                printBoard(board);
+                printBoard(playingBoard);
                 System.out.println("The computer won. Unlucky.");
             }
         }
@@ -233,29 +244,18 @@ public class Game {
         return yesAnswers.contains(answer);
     }
 
-    private static char[][] addMoves(char[][] board, boolean isFirst) {
+    private static void addMoves() {
         if (!isFirst) {
-            board = makeComputerMove(board);
+            playingBoard = makeComputerMove(playingBoard);
+            userCharacter = whosTurn(playingBoard);
         }
-        while (!findEmptySquares(board).isEmpty() && detectWin(board) == SPACE) {
-            printBoard(board);
-            Coordinates move = askForMove(board);
-            board[move.getRow()][move.getCol()] = whosTurn(board);
-            printBoard(board);
-            board = makeComputerMove(board);
-        }
-        return board;
-    }
-
-    private static void play() {
-        boolean isFirst = goesFirstOrSecond();
-        char[][] board = new char[][]{{SPACE,SPACE,SPACE}, {SPACE,SPACE,SPACE}, {SPACE,SPACE,SPACE}};
-        board = addMoves(board, isFirst);
-        printWinner(board, isFirst);
-        if (wantsToPlayAgain()) {
-            play();
-        } else {
-            System.out.println("Bye");
+        userCharacter = whosTurn(playingBoard);
+        while (!findEmptySquares(playingBoard).isEmpty() && detectWin(playingBoard) == SPACE) {
+            printBoard(playingBoard);
+            Coordinates move = askForMove(playingBoard);
+            playingBoard[move.getRow()][move.getCol()] = whosTurn(playingBoard);
+            printBoard(playingBoard);
+            playingBoard = makeComputerMove(playingBoard);
         }
     }
 
@@ -265,6 +265,7 @@ public class Game {
             int row = s.nextInt()-1;
             System.out.println("Which column would you like to go in? (1, 2 or 3)");
             int col = s.nextInt()-1;
+            s.nextLine();
             if (board[row][col] == SPACE && row >= 0 && row < 3 && col >= 0 && col < 3) {
                 return new Coordinates(row, col);
             }
