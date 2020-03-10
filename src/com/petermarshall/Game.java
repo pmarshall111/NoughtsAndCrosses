@@ -228,7 +228,6 @@ public class Game {
         } else {
             printBoard(playingBoard);
             System.out.println("The computer won. Unlucky.");
-            }
         }
     }
 
